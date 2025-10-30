@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arlesion Mission Style</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+body {
+  margin:0;
+  padding:0;
+  font-family:'Poppins',sans-serif;
+  background:url('background.jpg') no-repeat center center fixed;
+  background-size:cover;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  color:#222;
+}
+
+/* KIWI */
+.kiwi-box {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  position:relative;
+  text-align:center;
+  animation: fadeIn 1s ease forwards;
+}
+
+.kiwi-img {
+  width:200px;
+  height:auto;
+}
+
+.speech-bubble {
+  background:#fffaf0;
+  border:2px solid #e0b973;
+  border-radius:15px;
+  padding:12px 16px;
+  font-size:14px;
+  color:#4a3c2a;
+  max-width:260px;
+  box-shadow:2px 4px 10px rgba(0,0,0,0.1);
+  position:relative;
+  opacity:0;
+  transform:translateY(5px);
+  animation: bubbleAppear 1s forwards;
+}
+
+.speech-bubble::after {
+  content:"";
+  position:absolute;
+  bottom:-8px;
+  left:50%;
+  transform:translateX(-50%);
+  border-width:8px 8px 0;
+  border-style:solid;
+  border-color:#fffaf0 transparent;
+}
+
+/* Tombol WA */
+button {
+  margin-top:25px;
+  padding:12px 25px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  background:#000;
+  color:#fff;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover {
+  background:#444;
+}
+
+@keyframes bubbleAppear {
+  0% {opacity:0;transform:translateY(5px);}
+  100% {opacity:1;transform:translateY(0);}
+}
+
+@keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+</style>
+</head>
+<body>
+
+<div class="kiwi-box">
+  <div class="speech-bubble" id="kiwiText"></div>
+  <img src="kiwi.jpg" alt="Kiwi" class="kiwi-img">
+</div>
+
+<button id="waButton">Kirim ke Arle 🤍</button>
+
+<script>
+const kiwiText = document.getElementById("kiwiText");
+const message = "Ayo kirim hasil designmu ke Arle sekarang!! Dia pasti seneng banget dapet kabar dari kamu 🐾";
+let i = 0;
+
+function typeEffect() {
+  if (i < message.length) {
+    kiwiText.innerHTML += message.charAt(i);
+    i++;
+    setTimeout(typeEffect, 35);
+  }
+}
+
+window.addEventListener("load", () => setTimeout(typeEffect, 500));
+
+document.getElementById("waButton").addEventListener("click", () => {
+  // Ambil data dari localStorage
+  const client = JSON.parse(localStorage.getItem("arlesionClient")) || {};
+
+  // Data lama
+  const nama = client.name || "Tidak disebutkan";
+  const warna = client.warna || "Belum dipilih";
+  const siluet = client.siluet || "Belum dipilih";
+  const rok = client.rok || "Belum dipilih";
+  const mission = client.missionStyle || "Belum diisi";
+
+  // 🔥 Data tambahan dari halaman Final Note
+  const tanggal = client.date || "Belum diisi";
+  const model = client.model || "Belum diisi";
+  const tinggi = client.tinggi ? client.tinggi + " cm" : "Belum diisi";
+  const berat = client.berat ? client.berat + " kg" : "Belum diisi";
+  const ukuran = client.ukuran || "Belum diisi";
+
+  // Susun isi pesan lengkap
+  const pesan = `Hai 𓍼Arle𓍼
+Aku udah selesai main *Arlesion Mission* nih! Berikut hasil designku:
+
+🐾 Nama: ${nama}
+🐾 Warna: ${warna}
+🐾 Siluet: ${siluet}
+🐾 Tanggal Acara: ${tanggal}
+🐾 Model Kebaya: ${model}
+🐾 Tinggi: ${tinggi}
+🐾 Berat: ${berat}
+🐾 Ukuran Baju: ${ukuran}
+
+Ditunggu review dari Arle yaa 🤍`;
+
+  // Encode dan buka WhatsApp
+  const encoded = encodeURIComponent(pesan);
+  window.location.href = `https://wa.me/6281908816928?text=${encoded}`;
+});
+</script>
+
+</body>
+</html>

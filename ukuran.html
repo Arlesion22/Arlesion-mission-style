@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arlesion Mission Style- Ukuran</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background: url('background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100vh;
+  transition: opacity 0.5s ease; /* buat transisi halus */
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 0;
+}
+
+/* Tulisan Arlesion by Arle */
+.brand {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  margin-top: 60px;
+  margin-bottom: 40px;
+}
+
+.brand h1 {
+  font-size: 38px;
+  font-weight: 600;
+  margin: 0;
+  color: #000;
+  letter-spacing: 0.5px;
+}
+
+.brand p {
+  font-size: 15px;
+  font-weight: 400;
+  margin: 5px 0 0;
+  color: #000;
+  letter-spacing: 0.3px;
+}
+
+/* Container form */
+.container {
+  position: relative;
+  z-index: 1;
+  width: 320px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  padding: 30px;
+  text-align: center;
+  animation: fadeIn 0.8s ease forwards;
+}
+
+h2 {
+  font-weight: 600;
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: #000;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin-left: 10%;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+}
+
+input, select {
+  width: 80%;
+  padding: 10px;
+  margin: 8px 0 15px 0;
+  border-radius: 8px;
+  border: 1px solid #000;
+  font-size: 14px;
+  outline: none;
+  color: #000;
+  background-color: #fff;
+}
+
+input::placeholder {
+  color: #666;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #444;
+}
+
+/* ======================= KIWI ======================= */
+.kiwi-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: fixed;
+  bottom: 10px;
+  left: 20px;
+  z-index: 9999;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.kiwi-img {
+  width: 140px;
+  height: auto;
+}
+
+.speech-bubble {
+  background: #fffaf0;
+  border: 2px solid #e0b973;
+  border-radius: 15px;
+  padding: 12px 16px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: #4a3c2a;
+  max-width: 250px;
+  text-align: center;
+  box-shadow: 2px 4px 10px rgba(0,0,0,0.1);
+  position: relative;
+  opacity: 0;
+  transform: translateY(5px);
+  animation: bubbleAppear 0.8s forwards;
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 8px 0;
+  border-style: solid;
+  border-color: #fffaf0 transparent;
+}
+
+@keyframes bubbleAppear {
+  0% { opacity: 0; transform: translateY(5px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: scale(0.98); }
+  100% { opacity: 1; transform: scale(1); }
+}
+</style>
+</head>
+<body>
+
+<div class="brand">
+  <h1>Arlesion</h1>
+  <p>by Arle</p>
+</div>
+
+<div class="container">
+  <h2>Isi Ukuranmu ♡</h2>
+  
+  <label for="tinggi">Tinggi Badan (cm):</label>
+  <input type="number" id="tinggi" placeholder="Misal: 160">
+
+  <label for="berat">Berat Badan (kg):</label>
+  <input type="number" id="berat" placeholder="Misal: 50">
+
+  <label for="ukuran">Ukuran Baju:</label>
+  <select id="ukuran">
+    <option value="">Pilih ukuran</option>
+    <option value="XS">XS</option>
+    <option value="S">S</option>
+    <option value="M">M</option>
+    <option value="L">L</option>
+    <option value="XL">XL</option>
+    <option value="XXL">XXL</option>
+  </select>
+  
+  <button onclick="nextStep()">Lanjut ✨</button>
+</div>
+
+<!-- KIWI ASISTEN -->
+<div class="kiwi-box" id="kiwiBox">
+  <div class="speech-bubble" id="kiwiText"></div>
+  <img src="kiwi.jpg" alt="Kiwi" class="kiwi-img">
+</div>
+
+<script>
+let clientData = JSON.parse(localStorage.getItem('arlesionClient')) || {};
+
+function nextStep() {
+  const tinggi = document.getElementById('tinggi').value;
+  const berat = document.getElementById('berat').value;
+  const ukuran = document.getElementById('ukuran').value;
+
+  if (!tinggi || !berat || !ukuran) {
+    alert('Isi semua ukuran dulu ya, sayangku 🩰');
+    return;
+  }
+
+  clientData.tinggi = tinggi;
+  clientData.berat = berat;
+  clientData.ukuran = ukuran;
+  localStorage.setItem('arlesionClient', JSON.stringify(clientData));
+
+  alert(`Noted ${clientData.name || "sayangku"}! Ukuranmu ${ukuran} disimpan ya 💕`);
+  
+  // Transisi halus sebelum pindah ke data.html
+  document.body.style.opacity = 0;
+  setTimeout(() => {
+    window.location.href = "data.html";
+  }, 500);
+}
+
+// ================= KIWI =================
+const clientName = clientData.name || "Sayangku";
+const kiwiBox = document.getElementById("kiwiBox");
+const kiwiText = document.getElementById("kiwiText");
+
+const message = `Sekarang isi dulu ukuran badanmu ya ${clientName} biar Arle bisa jahitin bajunya pas sama badan kamu`;
+let index = 0;
+
+function typeEffect() {
+  if(index < message.length){
+    kiwiText.innerHTML += message.charAt(index);
+    index++;
+    setTimeout(typeEffect, 35);
+  } else {
+    setTimeout(() => {
+      kiwiBox.style.transition = "opacity 0.5s";
+      kiwiBox.style.opacity = 0;
+      kiwiBox.style.pointerEvents = "none";
+    }, 2000);
+  }
+}
+
+window.addEventListener("load", () => {
+  setTimeout(typeEffect, 500);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arlesion Mission Style</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+body {
+  margin:0;
+  padding:0;
+  font-family:'Poppins', sans-serif;
+  background: url('background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color:#222;
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height:100vh;
+  overflow:hidden;
+}
+
+/* Voucher */
+.voucher {
+  background: #fffaf0;
+  border: 3px dashed #e0b973;
+  border-radius: 15px;
+  padding: 20px 30px;
+  text-align: center;
+  margin-bottom: 30px;
+  box-shadow: 2px 4px 12px rgba(0,0,0,0.15);
+  animation: fadeIn 1s ease forwards;
+}
+.voucher h2 {
+  margin: 0;
+  color: #4a3c2a;
+  font-size: 20px;
+  font-weight: 600;
+}
+.voucher p {
+  margin: 5px 0 0;
+  color: #a17b3d;
+  font-weight: 500;
+}
+
+/* KIWI BOX */
+.kiwi-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.kiwi-img {
+  width: 200px;
+  height: auto;
+}
+
+/* Bubble */
+.speech-bubble {
+  background: #fffaf0;
+  border: 2px solid #e0b973;
+  border-radius: 15px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #4a3c2a;
+  max-width: 260px;
+  text-align: center;
+  box-shadow: 2px 4px 10px rgba(0,0,0,0.1);
+  position: relative;
+  opacity: 0;
+  transform: translateY(5px);
+  animation: bubbleAppear 0.8s forwards;
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 8px 0;
+  border-style: solid;
+  border-color: #fffaf0 transparent;
+}
+
+/* Tombol */
+button, .arrow-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  border:none;
+  border-radius:8px;
+  background:#222;
+  color:#fff;
+  cursor:pointer;
+  transition:0.3s;
+  font-family:'Poppins', sans-serif;
+}
+button:hover, .arrow-btn:hover { background:#555; }
+
+.arrow-btn {
+  margin-top: 15px;
+  font-size: 18px;
+  padding: 6px 14px;
+  border-radius: 50%;
+}
+#nextPage {
+  display:none;
+  margin-top: 25px;
+}
+
+/* Animasi */
+@keyframes bubbleAppear {
+  0% { opacity: 0; transform: translateY(5px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  0% { opacity: 0; transform: scale(0.98); }
+  100% { opacity: 1; transform: scale(1); }
+}
+</style>
+</head>
+<body>
+
+<div class="voucher">
+  <h2>🎟️ Limited Voucher Diskon 10%</h2>
+  <p>Untuk Custom Kebaya di Arlesion</p>
+</div>
+
+<div class="kiwi-box">
+  <div class="speech-bubble" id="kiwiText"></div>
+  <img src="kiwi.jpg" alt="Kiwi" class="kiwi-img">
+</div>
+
+<button class="arrow-btn" id="nextArrow">➜</button>
+<button id="nextPage" onclick="window.location.href='wa.html'">Lanjut 💬</button>
+
+<!-- Confetti Library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+const bubbles = [
+  "Aku udah bilang ke Arle kalau aku mau kasih hadiah kecil ke kamu yang bakal  buat Arle sakit perut hehe 😸",
+  "Diskon buat kamu yang udah mau ketemu dan konsultasi sama aku!",
+  "Screenshot ini ya dan kirim ke Arle supaya dapat potongan harga custom kebayanya 💖"
+];
+
+let index = 0;
+const kiwiText = document.getElementById("kiwiText");
+const arrow = document.getElementById("nextArrow");
+const nextBtn = document.getElementById("nextPage");
+
+function showBubbleText(text) {
+  kiwiText.style.opacity = 0;
+  kiwiText.style.animation = "none";
+  setTimeout(() => {
+    kiwiText.textContent = text;
+    kiwiText.style.animation = "bubbleAppear 0.8s forwards";
+  }, 100);
+}
+
+arrow.addEventListener("click", () => {
+  if (index < bubbles.length) {
+    showBubbleText(bubbles[index]);
+    index++;
+    if (index === bubbles.length) {
+      arrow.style.display = "none";
+      nextBtn.style.display = "inline-block";
+    }
+  }
+});
+
+window.addEventListener("load", () => {
+  showBubbleText(bubbles[0]);
+  index = 1;
+  launchConfetti(); // efek halus saat halaman dibuka
+});
+
+// === Confetti halus & ringan ===
+function launchConfetti() {
+  setTimeout(() => {
+    const duration = 1.8 * 1000; 
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 45, spread: 360, ticks: 60, zIndex: 999 };
+
+    function randomInRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    (function frame() {
+      confetti({
+        particleCount: 5,
+        angle: randomInRange(55, 125),
+        spread: 70,
+        origin: { x: Math.random(), y: 0 },
+        colors: ['#FFD700', '#FF69B4', '#A0E7E5', '#B4F8C8', '#FFF5E1'],
+        ...defaults
+      });
+      if (Date.now() < animationEnd) {
+        requestAnimationFrame(frame);
+      }
+    })();
+  }, 400); // delay sedikit biar muncul halus
+}
+</script>
+
+</body>
+</html>

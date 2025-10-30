@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arlesion Mission Style</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+body {
+  margin:0; padding:0;
+  font-family: 'Poppins', sans-serif;
+  background-image: url('background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color:#222;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding-top:30px;
+}
+
+.container {
+  display:flex;
+  gap:30px;
+  width:1200px;
+  position:relative;
+}
+
+.panel {
+  background:rgba(253,253,253,0.9);
+  border-radius:15px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.1);
+  padding:20px;
+  text-align:center;
+  position:relative;
+}
+
+#modelImage {
+  width:200px;
+  height:auto;
+  border-radius:10px;
+  border:1px solid #ccc;
+  display:block;
+  margin:0 auto;
+}
+
+#overlayCanvas {
+  position:absolute;
+  top:50px;
+  left:calc(50% - 100px);
+  width:200px;
+  height:300px;
+  pointer-events:none;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.siluetBtn {
+  display:inline-flex;
+  width:120px;
+  height:150px;
+  margin:10px;
+  border:2px solid #aaa;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.3s;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:5px;
+  white-space:normal;
+  line-height:1.2;
+}
+.siluetBtn:hover { border-color:#222; background:#eee; }
+
+button {
+  margin-top:20px;
+  padding:10px 20px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  background:#222;
+  color:#fff;
+  cursor:pointer;
+  transition:0.3s;
+}
+button:hover { background:#555; }
+
+/* 🐾 KIWI ASISTEN DI BAWAH, BUBBLE DI ATAS */
+.kiwi-box {
+  position: fixed;
+  bottom: 5px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 9999;
+}
+.kiwi-img {
+  width: 120px;
+  height: auto;
+}
+.speech-bubble {
+  background: #fffaf0;
+  border: 2px solid #e0b973;
+  border-radius: 15px;
+  padding: 8px 12px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: #4a3c2a;
+  max-width: 220px;
+  box-shadow: 2px 4px 10px rgba(0,0,0,0.1);
+  position: relative;
+  opacity: 0;
+  transform: translateY(2px);
+  animation: bubbleAppear 0.8s forwards;
+}
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 8px 0;
+  border-style: solid;
+  border-color: #fffaf0 transparent;
+}
+@keyframes bubbleAppear {
+  0% { opacity: 0; transform: translateY(2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Panel model -->
+  <div class="panel">
+    <h2>Model kamu</h2>
+    <img src="model.jpg" alt="Model Sketch" id="modelImage">
+    <canvas id="overlayCanvas" width="200" height="300"></canvas>
+  </div>
+
+  <!-- Panel pilihan siluet -->
+  <div class="panel">
+    <h2>Pilih Siluet Kebaya</h2>
+    <div class="siluetBtn" onclick="selectSiluet('lurus.jpg')">Siluet Lurus</div>
+    <div class="siluetBtn" onclick="selectSiluet('lengkung.jpg')">Siluet Lengkung</div>
+    <div class="siluetBtn" onclick="selectSiluet('panjang.jpg')">Siluet Panjang</div>
+    <div class="siluetBtn" onclick="selectSiluet('kutubaru.jpg')">Siluet Kutubaru</div>
+    <div class="siluetBtn" onclick="selectSiluet('janggan.jpg')">Siluet Janggan</div>
+    <div class="siluetBtn" onclick="selectSiluet('rampel.jpg')">Siluet Rampel</div>
+    <div class="siluetBtn" onclick="selectSiluet('sabrina.jpg')">Siluet Sabrina</div>
+    <p id="selectedText">Siluet terpilih: -</p>
+    <button onclick="nextStep()">Lanjut ke Mission</button>
+  </div>
+</div>
+
+<!-- 🐾 KIWI ASISTEN -->
+<div class="kiwi-box" id="kiwiBox">
+  <div class="speech-bubble" id="kiwiText"></div>
+  <img src="kiwi.jpg" alt="Kiwi" class="kiwi-img">
+</div>
+
+<script>
+// Ambil data dari halaman sebelumnya
+let clientData = JSON.parse(localStorage.getItem('arlesionClient')) || {};
+let selectedSiluet = clientData.siluet || null;
+
+// Setup canvas
+const canvas = document.getElementById('overlayCanvas');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+ctx.webkitImageSmoothingEnabled = false;
+ctx.mozImageSmoothingEnabled = false;
+ctx.msImageSmoothingEnabled = false;
+
+// Load gambar siluet
+const siluetImg = new Image();
+
+// Posisi dan skala siluet
+const siluetScale = 1.0;
+const siluetOffsetY = 115;
+const siluetOffsetX = 0;
+
+// Fungsi gambar overlay
+function drawOverlay(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(selectedSiluet){
+    siluetImg.src = selectedSiluet + '?v=' + Date.now();
+    siluetImg.onload = () => {
+      const width = 200;
+      const height = 300;
+      const siluetWidth = width * siluetScale;
+      const siluetHeight = siluetImg.height * (siluetWidth / siluetImg.width);
+      const xPos = (width - siluetWidth)/2 + siluetOffsetX;
+      const yPos = (height - siluetHeight)/2 + siluetOffsetY;
+      ctx.drawImage(siluetImg, xPos, yPos, siluetWidth, siluetHeight);
+    };
+  }
+}
+
+// Fungsi pilih siluet
+function selectSiluet(fileName){
+  selectedSiluet = fileName;
+  document.getElementById('selectedText').textContent = `Siluet terpilih: ${fileName.replace('.jpg','')}`;
+  clientData.siluet = fileName;
+  localStorage.setItem('arlesionClient', JSON.stringify(clientData));
+  drawOverlay();
+}
+
+// Lanjut ke tahap berikutnya
+function nextStep(){
+  if(!selectedSiluet){
+    alert('Pilih siluet dulu ya!');
+    return;
+  }
+  clientData.siluet = selectedSiluet;
+  localStorage.setItem('arlesionClient', JSON.stringify(clientData));
+  window.location.href = 'color.html';
+}
+
+// Gambar awal jika sudah pernah memilih
+if(selectedSiluet){ drawOverlay(); }
+
+// Efek ngetik teks Kiwi
+const kiwiText = document.getElementById("kiwiText");
+const message = "Pertama-tama pilih siluet kebaya yang kamu mau ya. Setelah itu klik tombol lanjut untuk proses pewarnaan!";
+let index = 0;
+
+function typeEffect() {
+  if (index < message.length) {
+    kiwiText.innerHTML += message.charAt(index);
+    index++;
+    setTimeout(typeEffect, 40);
+  }
+}
+
+// Delay biar bubble fade-in dulu
+window.addEventListener("load", () => {
+  setTimeout(typeEffect, 500);
+});
+</script>
+
+</body>
+</html>

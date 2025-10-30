@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arlesion Mission Style- Pilih Warna</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+body {
+  margin:0; 
+  padding:0;
+  font-family: 'Poppins', sans-serif;
+  background-image: url('background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color:#222;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.panel {
+  background: rgba(253,253,253,0.9);
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  padding: 30px 40px;
+  text-align: center;
+  position: relative;
+  max-width: 400px;
+}
+
+#modelImage {
+  width:200px;
+  height:auto;
+  border-radius:10px;
+  border:1px solid #ccc;
+  display:block;
+  margin:0 auto;
+}
+
+#overlayCanvas {
+  position:absolute;
+  top:80px;
+  left:50%;
+  transform:translateX(-50%);
+  width:200px;
+  height:300px;
+  pointer-events:none;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.colorPicker {
+  margin-top:30px;
+  width:120px;
+  height:50px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+button {
+  margin-top:20px;
+  padding:10px 20px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  background:#222;
+  color:#fff;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover { background:#555; }
+
+/* ======================= KIWI ======================= */
+.kiwi-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: fixed;
+  bottom: 10px;
+  left: 20px;
+  z-index: 9999;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.kiwi-img {
+  width: 140px;
+  height: auto;
+}
+
+.speech-bubble {
+  background: #fffaf0;
+  border: 2px solid #e0b973;
+  border-radius: 15px;
+  padding: 12px 16px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: #4a3c2a;
+  max-width: 250px;
+  text-align: center;
+  box-shadow: 2px 4px 10px rgba(0,0,0,0.1);
+  position: relative;
+  opacity: 0;
+  transform: translateY(5px);
+  animation: bubbleAppear 0.8s forwards;
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 8px 0;
+  border-style: solid;
+  border-color: #fffaf0 transparent;
+}
+
+@keyframes bubbleAppear {
+  0% { opacity: 0; transform: translateY(5px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="panel">
+    <h2>Warna Kebaya</h2>
+    <img src="model.jpg" alt="Model Sketch" id="modelImage">
+    <canvas id="overlayCanvas" width="200" height="300"></canvas>
+
+    <input type="color" id="colorPicker" class="colorPicker">
+    <p id="colorText">Warna terpilih: -</p>
+    <button onclick="nextStep()">Lanjut ke Preview</button>
+  </div>
+</div>
+
+<!-- KIWI ASISTEN -->
+<div class="kiwi-box" id="kiwiBox">
+  <div class="speech-bubble" id="kiwiTextColor"></div>
+  <img src="kiwi.jpg" alt="Kiwi" class="kiwi-img">
+</div>
+
+<script>
+let clientData = JSON.parse(localStorage.getItem('arlesionClient')) || {};
+let selectedSiluet = clientData.siluet || null;
+let selectedColor = clientData.warna || '#000000';
+
+const canvas = document.getElementById('overlayCanvas');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+const siluetImg = new Image();
+const modelWidth = 200;
+const modelHeight = 260;
+const siluetScale = 1.0;
+const siluetOffsetY = 115;
+const siluetOffsetX = 0;
+
+function drawColoredOverlay() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!selectedSiluet) return;
+  siluetImg.src = selectedSiluet;
+  siluetImg.onload = () => {
+    const siluetWidth = modelWidth * siluetScale;
+    const siluetHeight = siluetImg.height * (siluetWidth / siluetImg.width);
+    const xPos = (modelWidth - siluetWidth) / 2 + siluetOffsetX;
+    const yPos = (modelHeight - siluetHeight) / 2 + siluetOffsetY;
+    ctx.drawImage(siluetImg, xPos, yPos, siluetWidth, siluetHeight);
+
+    ctx.globalCompositeOperation = "source-in";
+    ctx.fillStyle = selectedColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.globalCompositeOperation = "source-over";
+  };
+}
+
+const colorPicker = document.getElementById('colorPicker');
+const colorText = document.getElementById('colorText');
+colorPicker.value = selectedColor;
+colorText.textContent = "Warna terpilih: " + selectedColor;
+
+colorPicker.addEventListener('input', () => {
+  selectedColor = colorPicker.value;
+  clientData.warna = selectedColor;
+  localStorage.setItem('arlesionClient', JSON.stringify(clientData)); 
+  colorText.textContent = "Warna terpilih: " + selectedColor;
+  drawColoredOverlay();
+});
+
+function nextStep(){
+  if(!selectedSiluet){
+    alert("Belum ada siluet yang dipilih dari halaman sebelumnya!");
+    window.location.href = "silhouette.html";
+    return;
+  }
+
+  // Simpan hasil warna dan gambar siluet berwarna ke localStorage
+  clientData.warna = selectedColor;
+  clientData.previewImage = canvas.toDataURL("image/png");
+  localStorage.setItem('arlesionClient', JSON.stringify(clientData));
+
+  window.location.href = "preview.html";
+}
+
+if(selectedSiluet){
+  drawColoredOverlay();
+} else {
+  alert("Belum ada siluet yang dipilih!");
+  window.location.href = "silhouette.html";
+}
+
+// ================= KIWI =================
+const clientName = clientData.name || "Sayangku";
+const clientItem = clientData.item || "kebaya";
+const kiwiBox = document.getElementById("kiwiBox");
+const kiwiTextColor = document.getElementById("kiwiTextColor");
+
+const messageColor = `oke ${clientName}🐾 Sekarang kita pilih warna untuk ${clientItem}mu! dan klik 'lanjut' untuk melihat hasilnya~`;
+let indexColor = 0;
+
+function typeEffectColor() {
+  if(indexColor < messageColor.length){
+    kiwiTextColor.innerHTML += messageColor.charAt(indexColor);
+    indexColor++;
+    setTimeout(typeEffectColor, 35);
+  } else {
+    setTimeout(() => {
+      kiwiBox.style.transition = "opacity 0.5s";
+      kiwiBox.style.opacity = 0;
+      kiwiBox.style.pointerEvents = "none";
+    }, 2000);
+  }
+}
+
+window.addEventListener("load", () => {
+  setTimeout(typeEffectColor, 500);
+});
+</script>
+
+</body>
+</html>
